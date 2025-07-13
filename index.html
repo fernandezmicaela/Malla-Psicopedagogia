@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Malla Interactiva - Psicopedagogía</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; background: #fefefe; }
+    .materia {
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-left: 5px solid #888;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .materia.aprobada {
+      background-color: #d4edda;
+      text-decoration: line-through;
+      border-left-color: #28a745;
+    }
+    .materia.bloqueada {
+      background-color: #f8d7da;
+      color: #999;
+      border-left-color: #dc3545;
+      cursor: not-allowed;
+    }
+    h2 { margin-top: 30px; }
+  </style>
+</head>
+<body>
+
+<h1>Malla Interactiva - Psicopedagogía</h1>
+<p>Hacé clic sobre una materia para marcarla como aprobada. Las correlativas se habilitan automáticamente.</p>
+
+<div id="materias-container"></div>
+
+<script>
+  const materias = [{"id": "bio", "nombre": "Biología Humana y Evolutiva", "correlativas": []}, {"id": "te", "nombre": "Teoría de la Educación", "correlativas": []}, {"id": "psa", "nombre": "Problemáticas Socio-Antropológicas", "correlativas": []}, {"id": "td1", "nombre": "Teoría del Desarrollo I", "correlativas": []}, {"id": "ipsi", "nombre": "Introducción a la Psicología", "correlativas": []}, {"id": "td1_diag", "nombre": "Técnicas de Diagnóstico Psicopedagógico I", "correlativas": []}, {"id": "teo1", "nombre": "Teología I", "correlativas": []}, {"id": "pp1", "nombre": "Práctica Profesionalizante I", "correlativas": []}, {"id": "td2_diag", "nombre": "Técnicas de Diagnóstico Psicopedagógico II", "correlativas": ["td1_diag"]}, {"id": "ped", "nombre": "Pedagogía General", "correlativas": []}, {"id": "td2", "nombre": "Teoría del Desarrollo II", "correlativas": ["td1"]}, {"id": "did", "nombre": "Didáctica General y Específicas", "correlativas": []}, {"id": "tae", "nombre": "Teorías del Aprendizaje y de Enseñanza", "correlativas": []}, {"id": "psprof", "nombre": "Psicología Profunda", "correlativas": ["ipsi"]}, {"id": "teo2", "nombre": "Teología II", "correlativas": []}, {"id": "pp2", "nombre": "Práctica Profesionalizante II", "correlativas": ["pp1", "td1_diag"]}, {"id": "epist", "nombre": "Epistemología de las Ciencias Sociales", "correlativas": []}, {"id": "psicoling", "nombre": "Psicolingüística", "correlativas": []}, {"id": "neuro", "nombre": "Neuropsicopatología", "correlativas": ["bio"]}, {"id": "pssoc", "nombre": "Psicología Social de la Educación", "correlativas": ["ipsi"]}, {"id": "did_esp", "nombre": "Didáctica Especial", "correlativas": []}, {"id": "tp1", "nombre": "Técnicas Proyectivas Psicopedagógicas I", "correlativas": ["ipsi", "psprof", "td1_diag", "td2_diag"]}, {"id": "teo3", "nombre": "Teología III", "correlativas": []}, {"id": "pp3", "nombre": "Práctica Profesionalizante III", "correlativas": ["pp2", "tae"]}, {"id": "pol", "nombre": "Políticas Educativas, de Salud y Legislación", "correlativas": []}, {"id": "trat_apr", "nombre": "Estrategias para el Tratamiento de los Problemas de Aprendizaje", "correlativas": ["tae", "neuro"]}, {"id": "clinica", "nombre": "Clínica Psicopedagógica", "correlativas": ["tae", "psprof"]}, {"id": "tp2", "nombre": "Técnicas Proyectivas Psicopedagógicas II", "correlativas": ["tp1"]}, {"id": "ovo", "nombre": "Orientación Vocacional y Ocupacional", "correlativas": []}, {"id": "etica", "nombre": "Ética y Deontología Profesional", "correlativas": []}, {"id": "pp4", "nombre": "Práctica Profesionalizante IV", "correlativas": ["pp1", "pp2", "pp3"]}];
+  const estado = {};
+
+  function actualizarVista() {
+    const container = document.getElementById("materias-container");
+    container.innerHTML = "";
+
+    const anios = {
+      "1º Año": [],
+      "2º Año": [],
+      "3º Año": [],
+      "4º Año": []
+    };
+
+    materias.forEach((m, i) => {
+      if (i < 8) anios["1º Año"].push(m);
+      else if (i < 16) anios["2º Año"].push(m);
+      else if (i < 24) anios["3º Año"].push(m);
+      else anios["4º Año"].push(m);
+    });
+
+    for (const [anio, lista] of Object.entries(anios)) {
+      const h2 = document.createElement("h2");
+      h2.textContent = anio;
+      container.appendChild(h2);
+
+      lista.forEach(materia => {
+        const aprobadas = materia.correlativas.every(id => estado[id]);
+        const aprobada = estado[materia.id];
+        const bloqueada = !aprobadas && !aprobada;
+
+        const div = document.createElement("div");
+        let classes = "materia";
+        if (aprobada) classes += " aprobada";
+        if (bloqueada) classes += " bloqueada";
+        div.className = classes;
+        div.textContent = materia.nombre;
+        div.onclick = () => {
+          if (!bloqueada || aprobada) {
+            estado[materia.id] = !estado[materia.id];
+            actualizarVista();
+          }
+        };
+        container.appendChild(div);
+      });
+    }
+  }
+
+  actualizarVista();
+</script>
+
+</body>
+</html>
